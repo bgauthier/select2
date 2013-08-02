@@ -644,6 +644,9 @@ the specific language governing permissions and limitations under the Apache Lic
 
     AbstractSelect2 = clazz(Object, {
 
+        // Array of options (items)
+        store: [],
+        
         // abstract
         bind: function (func) {
             var self = this;
@@ -1561,6 +1564,15 @@ the specific language governing permissions and limitations under the Apache Lic
                 } else {
                     render("");
                 }
+                
+                if (this.store.length > 0) {                    
+                	self.opts.populateResults.call(this, results, this.store, {term: search.val(), page: this.resultsPage, context:null});
+                	data = {results:this.store}; 
+                	this.postprocessResults(data, initial);
+                	postRender();
+                    this.opts.element.trigger({ type: "select2-loaded", items: data });
+            	}
+                
                 if (initial && this.showSearch) this.showSearch(true);
                 return;
             }
@@ -1631,6 +1643,8 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
 
                 results.empty();
+                // Keep copy of current items
+                this.store = data.results;
                 self.opts.populateResults.call(this, results, data.results, {term: search.val(), page: this.resultsPage, context:null});
 
                 if (data.more === true && checkFormatter(opts.formatLoadMore, "formatLoadMore")) {
